@@ -15,21 +15,22 @@ class Playground:
         self.square = self.height * self.width
         self.alpha = alpha
         
-        typical_shape = (self.height, self.width)
+        self.typical_shape = (self.height, self.width)
         
-        
-        self.mines = np.zeros(typical_shape, dtype = 'bool')
+        self.mines = np.zeros(self.typical_shape, dtype = 'bool')
         self.place_mines()
         
         self.find_values()
         
-        self.player_field = np.full(typical_shape, '*')
+        self.player_field = np.full(self.typical_shape, '*')
         
     def place_mines(self):
         self.amount_of_mines = place_mines(self.height, self.width, self.alpha, self.mines)
     
     def find_values(self):
-        self.values = find_values(self.height, self.width, self.mines)
+        mask = np.ones((3,3))
+        mask[1][1] = 0
+        self.values = convolve(self.mines, mask, mode='constant', cval=0.0)
     
     def show(self):
         print()
@@ -70,22 +71,6 @@ def place_mines(height, width, alpha, mines):
         
     return amount_of_mines
 
-@jit(nopython=True)
-def find_values(height, width, mines):
-    temp_vals = np.zeros((height + 2, width + 2))
-    mask = np.ones((3,3))
-    mask[1][1] = 0
-    for y in range(height):
-        for x in range(width):
-            if mines[y, x]:
-                temp_vals[y:y+3, x:x+3] += mask
-                    
-    for y in range(height):
-        for x in range(width):
-            if mines[y, x]:
-                temp_vals[y+1, x+1] = -1
-                
-    return temp_vals[1:-1, 1:-1]
 
 class Game:
     
