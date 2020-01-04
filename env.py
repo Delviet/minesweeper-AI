@@ -1,5 +1,6 @@
 import numpy as np
 from numba import jit
+from scipy.ndimage import convolve
 
 class Playground:
     
@@ -114,5 +115,10 @@ class Game:
         if self.mode == 'player':
             self.pg.show()
         else:
-            return self.pg.player_field
-
+            frames = np.empty((self.height * self.width, 5, 5), dtype = 'str')
+            new_df = np.zeros((self.height + 4, self.width + 4), dtype = 'str')
+            new_df[2:-2, 2:-2] = self.pg.player_field
+            for y in range(self.height):
+                for x in range(self.width):
+                    frames[y * self.width + x] = new_df[y:y+5, x:x+5].reshape(1, 5, 5)
+            return frames
