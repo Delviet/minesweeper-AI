@@ -1,0 +1,14 @@
+Once I have decided to get into RL by myself. I already have had some knowledge about this area of AI, so I started with practice in the game, which I am familiar with - Minesweeper.  
+Basic idea was to walk a sliding window (5*5) on the playground and count some value for each cell in it. After that, press cell with the highest score until the game ends.
+Fitting process is following: a batch of matches is played by A.I. and if bot "clicks" on the clear field then the target cell's score is increased by 1. Otherwise, if it "clicks" min target cell's score is decreased by 1. 
+
+Trial bot is represented in alpha_bot.ipynb. It fits for a pretty long time and wins nearly 30% of games at 9*9 playground with 12 mines. 
+
+Plan is to:
+change architecture (make two inputs: one (vector-style) for DNN and another (square-style) for both DNN and CNN);
+add epsilon-learning; 
+fit model not on playgrounds of the same shape and with the same amount of mines, but different ones (it will lead to better scalability of the model).
+
+BUT AT FIRST:
+1. I have seen video on Youtube (https://www.youtube.com/watch?v=BYhWFRk4WUU), in which guy told, that his greedy solver for minesweeper (10*10 playground with 10 mines) works well only in 13% of cases. It seems ridiculous for me, as it should work better. I'll write it on my own and check the result.
+2. I want to write an algorithmic solution for this game (it should not be too hard).
