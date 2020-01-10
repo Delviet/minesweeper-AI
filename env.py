@@ -8,8 +8,8 @@ class Playground:
     def __init__(self, height, width, alpha = 0.2):
         
         assert (alpha < 1) and (alpha > 0)
-        assert (height >= 3) and (type(height) == int)
-        assert (width >= 3) and (type(width) == int)
+        assert (height >= 1) and (type(height) == int)
+        assert (width >= 1) and (type(width) == int)
         
         self.height = height
         self.width = width
