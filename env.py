@@ -8,8 +8,8 @@ class Playground:
     def __init__(self, height, width, alpha = 0.2):
         
         assert (alpha < 1) and (alpha > 0)
-        assert (height >= 1) and (type(height) == int)
-        assert (width >= 1) and (type(width) == int)
+        assert (height >= 3) and (type(height) == int)
+        assert (width >= 3) and (type(width) == int)
         
         self.height = height
         self.width = width
@@ -17,21 +17,21 @@ class Playground:
         self.alpha = alpha
         
         self.typical_shape = (self.height, self.width)
+        self.player_field = np.full(self.typical_shape, '*')
         
+    def fully_generate(self, x_point, y_point):
         self.mines = np.zeros(self.typical_shape, dtype = 'bool')
-        self.place_mines()
+        self.place_mines(x_point, y_point)
         
         self.find_values()
         
-        self.player_field = np.full(self.typical_shape, '*')
-        
-    def place_mines(self):
-        self.amount_of_mines = place_mines(self.height, self.width, self.alpha, self.mines)
+    def place_mines(self, x_point, y_point):
+        self.amount_of_mines = place_mines(self.height, self.width, self.alpha, self.mines, x_point, y_point)
     
     def find_values(self):
         mask = np.ones((3,3))
         mask[1][1] = 0
-        self.values = convolve(self.mines, mask, mode='constant', cval=0.0)
+        self.values = convolve(self.mines.astype(np.uint8), mask, mode='constant', cval=0.0)
     
     def show(self):
         print()
@@ -54,18 +54,23 @@ class Playground:
             self.player_field[y, x] = str(self.values[y, x])
             
             if self.values[y, x] == 0:
-                if x > 0: result += self.enter(x-1,y)
+                if x > 0: result += self.enter(x-1,y) 
                 if y > 0: result += self.enter(x,y-1)
                 if x < self.width - 1: result += self.enter(x+1,y)
                 if y < self.height - 1: result += self.enter(x,y+1)
+                if (x > 0 and y > 0): result += self.enter(x-1,y-1)
+                if (x > 0 and y < self.height - 1): result += self.enter(x-1,y+1)
+                if (x < self.width - 1 and y > 0): result += self.enter(x+1,y-1)
+                if (x < self.width - 1 and y < self.height - 1): result += self.enter(x+1,y+1)
             
         return result
 
     
 @jit(nopython=True)
-def place_mines(height, width, alpha, mines):
+def place_mines(height, width, alpha, mines, x, y):
     amount_of_mines = int(np.round(height * width * alpha))
     positions = np.arange(height * width)
+    positions = np.delete(positions, y*width + x)
     np.random.shuffle(positions)
     for pos in positions[:amount_of_mines]:
         mines[pos // width, pos % width] = True
@@ -84,24 +89,30 @@ class Game:
         assert mode == 'player' or mode == 'bot'
         self.mode = mode
         self.pg = Playground(self.height, self.width, self.alpha)
-        self.mines_amount = self.pg.amount_of_mines
         self.closed = self.height * self.width
         self.game_runned = True
+        self.field_generated = False
         self.won = False
+        self.lose = False
     
     def do_step(self, x, y):
+        if not self.field_generated:
+            self.pg.fully_generate(x, y)
+            self.mines_amount = self.pg.amount_of_mines
+
+            self.field_generated = True
         if self.game_runned:
             result = self.pg.enter(int(x), int(y))
             if result == -1:
                 self.fail_game()
             else:
                 self.closed -= result
-        self.pg.show()
         if self.closed == self.mines_amount:
             self.win_game()
         
     def fail_game(self):
         self.game_runned = False
+        self.lose = True
         if self.mode == 'player':
             print("You have failed!")
         
