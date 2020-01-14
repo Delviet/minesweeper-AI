@@ -1,3 +1,4 @@
+Part I:
 Once I have decided to get into RL by myself. I already have had some knowledge about this area of AI, so I started with practice in the game, which I am familiar with - Minesweeper.  
 Basic idea was to walk a sliding window (5*5) on the playground and count some value for each cell in it. After that, press cell with the highest score until the game ends.
 Fitting process is following: a batch of matches is played by A.I. and if bot "clicks" on the clear field then the target cell's score is increased by 1. Otherwise, if it "clicks" min target cell's score is decreased by 1. 
@@ -12,3 +13,17 @@ fit model not on playgrounds of the same shape and with the same amount of mines
 BUT AT FIRST:
 1. I have seen video on Youtube (https://www.youtube.com/watch?v=BYhWFRk4WUU), in which guy told, that his greedy solver for minesweeper (10*10 playground with 10 mines) works well only in 13% of cases. It seems ridiculous for me, as it should work better. I'll write it on my own and check the result.
 2. I want to write an algorithmic solution for this game (it should not be too hard).
+
+
+
+Part II:
+Trying to implement greedy solver, I have found some interesting problem, which leads to proposition, that greedy algorithms are not the best case in such type of tasks. 
+Lets consider situation, when we get value "1" in cell (1, 1) and decide, whether we should tap (2, 2) or not. Reward expectation in this case will be 0.75, which is greater, than zero. So, during learning agent will tap on (2, 2) in such situation nearly always. 
+So, 1/8 of games would be lost because of this step. It is 12.5% of games. 
+And following steps also may lead to losing. 
+So, two possible solutions are 
+1. changing rewarding policy (+1 for correct and -8 for incorrect)
+2. softmaxing the results
+I'll try both options and see the income.
+
+P.s. I've updated env, now agent is unable to die after the first step, so amount of winned matches has increased.
